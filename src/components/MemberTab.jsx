@@ -160,6 +160,14 @@ export default function MemberTab({ clerks, onAddClerk, onUpdateClerk, onDeleteC
 
   return (
     <div className="content-body">
+      {/* Alert Banner for Firebase Auth */}
+      <div className="card" style={{ margin: '0 0 20px 0', padding: '12px 16px', borderLeft: '4px solid #8b5cf6', borderRadius: '8px', fontSize: '0.85rem', backgroundColor: '#f5f3ff', color: '#5b21b6' }}>
+        <p style={{ margin: 0, fontWeight: 600 }}>🔒 Firebase Authentication 계정 연동 안내</p>
+        <p style={{ margin: '4px 0 0 0', lineHeight: '1.4' }}>
+          실제 로그인이 정상 작동하려면 **Firebase Console ➡️ Authentication** 메뉴에서 **'사용자 추가'**를 클릭하여 동일한 이메일과 비밀번호를 등록해 주셔야 합니다. (로그인 아이디 입력 시 도메인이 없는 경우 자동으로 `아이디@clerk.com`으로 변환되어 로그인됩니다.)
+        </p>
+      </div>
+
       <div className="actions-bar">
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', flex: 1 }}>
           {/* Search */}

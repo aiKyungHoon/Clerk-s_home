@@ -5,7 +5,8 @@ import AttendanceTab from './components/AttendanceTab';
 import MemberTab from './components/MemberTab';
 import LoginPage from './components/LoginPage';
 import { getMockRecords, getMockMembers } from './mockData';
-import { db } from './firebase';
+import { db, auth } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 
 // Safe Storage Helpers to prevent SecurityErrors in Safari Private Mode & Edge InPrivate Mode
@@ -61,6 +62,44 @@ export default function App() {
   });
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'attendance', 'members'
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Monitor Firebase Auth state change
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const userEmail = firebaseUser.email;
+        const profile = clerks.find(c => 
+          String(c.email || c.id).toLowerCase() === userEmail.toLowerCase() || 
+          String(c.uid) === firebaseUser.uid
+        );
+        if (profile) {
+          setCurrentUser(profile);
+          setIsLoggedIn(true);
+          safeSessionSet('clerks_logged_in', 'true');
+          safeSessionSet('clerks_current_user', JSON.stringify(profile));
+        } else if (clerks.length > 0) {
+          const tempProfile = {
+            id: userEmail.split('@')[0],
+            email: userEmail,
+            name: userEmail.split('@')[0],
+            role: 'super',
+            region: '전체',
+            uid: firebaseUser.uid
+          };
+          setCurrentUser(tempProfile);
+          setIsLoggedIn(true);
+          safeSessionSet('clerks_logged_in', 'true');
+          safeSessionSet('clerks_current_user', JSON.stringify(tempProfile));
+        }
+      } else {
+        setIsLoggedIn(false);
+        setCurrentUser({ username: '', role: '', region: '전체', name: '' });
+        safeSessionRemove('clerks_logged_in');
+        safeSessionRemove('clerks_current_user');
+      }
+    });
+    return () => unsubscribe();
+  }, [clerks]);
   
   // Weekly selection state (주차별 관리)
   const [selectedYear, setSelectedYear] = useState(2026);
@@ -387,12 +426,13 @@ export default function App() {
           </div>
           <button 
             className="btn-logout"
-            onClick={() => {
-              setIsLoggedIn(false);
-              setCurrentUser({ username: '', role: '', region: '전체', name: '' });
-              safeSessionRemove('clerks_logged_in');
-              safeSessionRemove('clerks_current_user');
-              setIsSidebarOpen(false);
+            onClick={async () => {
+              try {
+                await signOut(auth);
+                setIsSidebarOpen(false);
+              } catch (e) {
+                console.warn("Signout failed:", e);
+              }
             }}
           >
             로그아웃

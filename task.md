@@ -17,7 +17,7 @@
   - [x] Fix total member fallback display (1명 ➡️ 0명) and division-by-zero guards in KPI sub-labels
   - [x] Unify columns and filters in DashboardTab with AttendanceTab (adding missing columns like `21시` and Moimbang headers)
   - [x] Add **전체** (All) filter option to the segmented selector on the Dashboard, creating a three-way concept filter (**전체**, **총교등자**, **입교자**)
-  - [x] Add `줌` (Zoom) column to the `기타` group in the Wednesday table
+  - [x] Add `줌` (Zoom) column to the `기타` group in the Sunday and Wednesday tables
 - [x] Attendance Tab (`AttendanceTab.jsx`)
   - [x] Excel Upload interface with parsing
   - [x] Download Excel Template with 16 required columns
@@ -43,7 +43,7 @@
   - [x] Fix data loss between Sunday and Wednesday report text imports by implementing a zipping merger (dummy rows reuse and merge across imports)
   - [x] Resolve regional hashtags (e.g. `#성군지역`) and miscellaneous categories (`새신자교육`, `선유월예배`, `자문회예배`, `사랑예배`, `타부서모임방`) parsing errors
   - [x] Fix database state pollution during weekly update calls to only map active week's records
-  - [x] Add `줌` (Zoom) column to the `기타` group in the Wednesday table
+  - [x] Add `줌` (Zoom) column to the `기타` group in the Sunday and Wednesday tables
 - [x] Report Auto-Generator Modal (`ReportModal.jsx`)
   - [x] Tuesday/Sunday/Other days tab UI
   - [x] Keyword parsing logic (Face-to-face, Zoom, 대체, 결석, 미보고)

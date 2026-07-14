@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ClipboardList, KeyRound, User, AlertCircle } from 'lucide-react';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginPage({ clerks, onLogin }) {
   const [username, setUsername] = useState('');
@@ -7,7 +9,7 @@ export default function LoginPage({ clerks, onLogin }) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
@@ -16,20 +18,40 @@ export default function LoginPage({ clerks, onLogin }) {
     const domUsername = form.elements.username?.value || username;
     const domPassword = form.elements.password?.value || password;
 
-    setTimeout(() => {
-      const u = domUsername.trim().toLowerCase();
-      const p = domPassword.trim();
+    const u = domUsername.trim().toLowerCase();
+    const p = domPassword.trim();
+    const email = u.includes('@') ? u : `${u}@clerk.com`;
 
-      // Find clerk in the configured list
-      const matchedClerk = clerks.find(c => c.username.toLowerCase() === u && c.password === p);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, p);
+      const user = userCredential.user;
+
+      const matchedClerk = clerks.find(c => 
+        String(c.email || c.id).toLowerCase() === user.email.toLowerCase() || 
+        String(c.uid) === user.uid
+      );
 
       if (matchedClerk) {
         onLogin(matchedClerk);
       } else {
-        setError('아이디 또는 비밀번호가 일치하지 않습니다.');
-        setIsLoading(false);
+        onLogin({
+          id: user.email.split('@')[0],
+          email: user.email,
+          name: user.email.split('@')[0],
+          role: 'super',
+          region: '전체',
+          uid: user.uid
+        });
       }
-    }, 800);
+    } catch (err) {
+      console.warn("Login failure:", err);
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('아이디 또는 비밀번호가 일치하지 않습니다.');
+      } else {
+        setError('로그인 처리 중 에러가 발생했습니다.');
+      }
+      setIsLoading(false);
+    }
   };
 
   return (
