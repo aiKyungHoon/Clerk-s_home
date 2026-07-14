@@ -51,6 +51,14 @@ export default function LoginPage({ clerks, onLogin }) {
       }
     } catch (err) {
       console.warn("Login failure:", err);
+      const localClerk = clerks.find(clerk =>
+        String(clerk.username || '').toLowerCase() === u && String(clerk.password || '') === p
+      );
+      if (localClerk) {
+        onLogin(localClerk);
+        setIsLoading(false);
+        return;
+      }
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('아이디 또는 비밀번호가 일치하지 않습니다.');
       } else {

@@ -62,6 +62,7 @@ export default function App() {
   });
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'attendance', 'members'
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [clerks, setClerks] = useState([]);
 
   // Monitor Firebase Auth state change
   useEffect(() => {
@@ -137,12 +138,18 @@ export default function App() {
   // State for attendance records
   const [records, setRecords] = useState([]);
 
-  // Clerk accounts state (the administrators who manage attendance)
-  const [clerks, setClerks] = useState([]);
-
   const defaultClerks = [
     { id: '1', username: 'admin', password: 'admin1234', name: '전체 관리자', role: 'super', region: '전체' },
-    { id: '2', username: 'sangam', password: 'sangam1234', name: '상암지역 총무', role: 'region', region: '상암지역' }
+    { id: 'region-hwajeong', username: 'hwajeong', email: 'hwajeong@clerk.com', password: 'hwajeong1234', name: '화정지역 담당자', role: 'region', region: '화정지역' },
+    { id: 'region-daehak', username: 'daehak', email: 'daehak@clerk.com', password: 'daehak1234', name: '대학지역 담당자', role: 'region', region: '대학지역' },
+    { id: 'region-sangam', username: 'sangam', email: 'sangam@clerk.com', password: 'sangam1234', name: '상암지역 담당자', role: 'region', region: '상암지역' },
+    { id: 'region-myeongdong', username: 'myeongdong', email: 'myeongdong@clerk.com', password: 'myeongdong1234', name: '명동지역 담당자', role: 'region', region: '명동지역' },
+    { id: 'region-saesomang', username: 'saesomang', email: 'saesomang@clerk.com', password: 'saesomang1234', name: '새소망지역 담당자', role: 'region', region: '새소망지역' },
+    { id: 'region-seonggun', username: 'seonggun', email: 'seonggun@clerk.com', password: 'seonggun1234', name: '성군지역 담당자', role: 'region', region: '성군지역' },
+    { id: 'region-saesinja', username: 'saesinja', email: 'saesinja@clerk.com', password: 'saesinja1234', name: '새신자지역 담당자', role: 'region', region: '새신자지역' },
+    { id: 'region-seungri', username: 'seungri', email: 'seungri@clerk.com', password: 'seungri1234', name: '승리지역 담당자', role: 'region', region: '승리지역' },
+    { id: 'region-pyeonghwa', username: 'pyeonghwa', email: 'pyeonghwa@clerk.com', password: 'pyeonghwa1234', name: '평화지역 담당자', role: 'region', region: '평화지역' },
+    { id: 'region-gukje', username: 'gukje', email: 'gukje@clerk.com', password: 'gukje1234', name: '국제지역 담당자', role: 'region', region: '국제지역' }
   ];
 
   // Sync clerks from Firestore/LocalStorage
@@ -155,8 +162,12 @@ export default function App() {
           snapshot.forEach(doc => {
             list.push({ id: doc.id, ...doc.data() });
           });
-          setClerks(list);
-          safeLocalSet('attendance_clerks', JSON.stringify(list));
+          const existingKeys = new Set(list.flatMap(clerk => [clerk.username, clerk.region]));
+          const missingDefaults = defaultClerks.filter(clerk => !existingKeys.has(clerk.username) && !existingKeys.has(clerk.region));
+          const mergedList = [...list, ...missingDefaults];
+          setClerks(mergedList);
+          safeLocalSet('attendance_clerks', JSON.stringify(mergedList));
+          missingDefaults.forEach(clerk => setDoc(doc(db, "clerks", String(clerk.id)), clerk).catch(e => console.warn("Firestore clerk migration error:", e)));
         } else {
           setClerks(defaultClerks);
           defaultClerks.forEach(c => {
@@ -402,7 +413,7 @@ export default function App() {
                 출결관리
               </button>
             </li>
-            <li className="sidebar-item">
+            {currentUser.role === 'super' && <li className="sidebar-item">
               <button 
                 className={`sidebar-link ${activeTab === 'members' ? 'active' : ''}`}
                 onClick={() => {
@@ -413,7 +424,7 @@ export default function App() {
                 <Users size={18} />
                 담당자 관리
               </button>
-            </li>
+            </li>}
           </ul>
         </nav>
 
@@ -504,7 +515,7 @@ export default function App() {
             setSelectedWeek={setSelectedWeek}
           />
         )}
-        {activeTab === 'members' && (
+        {activeTab === 'members' && currentUser.role === 'super' && (
           <MemberTab 
             clerks={clerks} 
             onAddClerk={handleAddClerk}

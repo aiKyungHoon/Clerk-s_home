@@ -772,7 +772,8 @@ export default function AttendanceTab({
   };
 
   const handleApplyTextReport = (parsedData) => {
-    const { region, hasSunday, hasWednesday, sunCg, sunIp, wedCg, wedIp, parsedPeople } = parsedData;
+    const { region: parsedRegion, hasSunday, hasWednesday, sunCg, sunIp, wedCg, wedIp, parsedPeople } = parsedData;
+    const region = currentUser.role === 'region' ? currentUser.region : parsedRegion;
 
     const normalizeRegion = (name) => (name || '').replace('지역', '').trim();
     const activeWeekKey = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${selectedWeek}`;
@@ -1108,7 +1109,9 @@ export default function AttendanceTab({
   // ===================================================
   // Sunday & Wednesday Worship Breakdown Calculations for Attendance Tab
   // ===================================================
-  const regionsList = ['화정', '대학', '상암', '명동', '새소망', '성군', '새신자', '승리', '평화', '국제'];
+  const regionsList = currentUser.role === 'region'
+    ? [normalizeRegion(currentUser.region)]
+    : ['화정', '대학', '상암', '명동', '새소망', '성군', '새신자', '승리', '평화', '국제'];
 
   const getSundayRowData = (regionName) => {
     const regRecords = records.filter(r => normalizeRegion(r.지역) === normalizeRegion(regionName));
