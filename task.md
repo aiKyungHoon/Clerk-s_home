@@ -1,0 +1,108 @@
+# Tasks: Worship Attendance Dashboard (Clerk's Home)
+
+- [x] Project setup & initialization
+  - [x] Initialize Vite React project
+  - [x] Install dependencies (`xlsx`, `lucide-react`, `xlsx-js-style`, `firebase`)
+  - [x] Configure Tailwind/CSS & main assets
+- [x] Core layout and navigation
+  - [x] Set up Sidebar, active tab state
+  - [x] Initialize global state & mock data in `App.jsx`
+- [x] Dashboard Tab (`DashboardTab.jsx`)
+  - [x] KPI Metrics cards
+  - [x] Worship type distribution charts & Weekly trend weekly charts
+  - [x] Unreported/Absent table listing
+  - [x] Fix `totalConfirmed` ReferenceError
+  - [x] Add Sunday Worship Regional Breakdown Table
+  - [x] Add Wednesday Worship Regional Breakdown Table & Toggle Tab
+  - [x] Fix total member fallback display (1명 ➡️ 0명) and division-by-zero guards in KPI sub-labels
+  - [x] Unify columns and filters in DashboardTab with AttendanceTab (adding missing columns like `21시` and Moimbang headers)
+  - [x] Add **전체** (All) filter option to the segmented selector on the Dashboard, creating a three-way concept filter (**전체**, **총교등자**, **입교자**)
+  - [x] Add `줌` (Zoom) column to the `기타` group in the Wednesday table
+- [x] Attendance Tab (`AttendanceTab.jsx`)
+  - [x] Excel Upload interface with parsing
+  - [x] Download Excel Template with 16 required columns
+  - [x] Editable Grid/Table (Inline additions, updates, deletions)
+  - [x] Export current attendance list to Excel
+  - [x] Add Data Reset (초기화) button to toolbar
+  - [x] Implement report text paste import feature ("텍스트 업로드")
+  - [x] Add smart fallback seeder when literal '000명' text templates are pasted
+  - [x] Fix cross-week data loss during text upload merges using `allRecords`
+  - [x] Add dynamic Worship Tab toggle (주일예배 / 삼일예배) to the Grid layout
+  - [x] Render live summary green breakdown tables inside the Attendance tab above the grid
+  - [x] Hide irrelevant worship day columns dynamically in the grid to avoid horizontal scrolling
+  - [x] Implement full real-name automatic mapping from text reports into the grid (no dummy names)
+  - [x] Remove the large dashed border empty state box
+  - [x] Clean table empty state (render null when empty, leaving table blank)
+  - [x] Hide table headers completely when there is no data to display
+  - [x] Add segmented selector for Planned vs Actual (사전 / 실제) worship days
+  - [x] Dynamically compute summary breakdown tables independently using the selected worship day and type (주일사전, 주일실제, 삼일사전, 삼일실제)
+  - [x] Export the green summary breakdown table (matrix sheet) exactly as shown in the UI on click of Excel Download
+  - [x] Enable Excel Download to execute even when no records exist, producing blank matrix layouts
+  - [x] Export visual summary green table including background colors and merges via styled HTML-to-Excel conversion ("현황표 엑셀")
+  - [x] Refactor styled summary Excel export to output natively as styled `.xlsx` (using `xlsx-js-style`), eliminating Excel security warning popups upon opening
+  - [x] Fix data loss between Sunday and Wednesday report text imports by implementing a zipping merger (dummy rows reuse and merge across imports)
+  - [x] Resolve regional hashtags (e.g. `#성군지역`) and miscellaneous categories (`새신자교육`, `선유월예배`, `자문회예배`, `사랑예배`, `타부서모임방`) parsing errors
+  - [x] Fix database state pollution during weekly update calls to only map active week's records
+  - [x] Add `줌` (Zoom) column to the `기타` group in the Wednesday table
+- [x] Report Auto-Generator Modal (`ReportModal.jsx`)
+  - [x] Tuesday/Sunday/Other days tab UI
+  - [x] Keyword parsing logic (Face-to-face, Zoom, 대체, 결석, 미보고)
+  - [x] Copy to Clipboard functionality with feedback
+  - [x] Map Sunday (금,토,일,월) and Wednesday (화,수,목) worship types
+  - [x] Implement the new template separating 총교등자 and 입교자 for both Sunday and Wednesday
+  - [x] Dynamic region labeling (Selected region or '전체' ➡️ '청년회')
+- [x] Enhanced KakaoTalk Text Parser (`TextUploadModal.jsx`)
+  - [x] Default to Sunday worship mode if "삼일" keywords are absent (avoiding header parsing errors)
+  - [x] Support optional parentheses around numerical values (e.g. `(19)` and `(1)`)
+  - [x] Scan and extract all names from the respective absentee blocks line-by-line
+  - [x] Parse names line-by-line for every attendance category (Hwajeong, Moimbang, Zoom, 대체, 기타)
+  - [x] Support names with English letter and digit suffixes (e.g., `이재현A`, `김성은88`) to prevent count discrepancies
+  - [x] Strip optional numeric suffix from Moimbang location headers (e.g., `*주엽 44` -> `주엽`) to avoid slot mismatch
+  - [x] Support asterisk prefixes for categories like `*당일`, `*목대체`, `*결석`, `*미보고`
+  - [x] Fix regex time-matching rules to prevent capturing digit values from counts into parsed times (e.g., `*12시 17` parsing as `12시1` instead of `12시`)
+- [x] Clerk Account Management Tab (`MemberTab.jsx` Rebranded to Clerk / Manager Management)
+  - [x] List registered clerks (attendance managers) with search
+  - [x] Add/Edit/Delete manager accounts with roles (Super / Regional)
+- [x] Administrator Login & Session
+  - [x] Create `LoginPage.jsx` with custom styling
+  - [x] Connect Login page and session guards in `App.jsx`
+  - [x] Integrate logout callback in Sidebar
+- [x] Weekly Selector Bar & weekKey Integration
+  - [x] Add Weekly Selector Bar under the top header in `App.jsx`
+  - [x] Restructure database state to save/load records keyed by `weekKey`
+  - [x] Pre-populate mock records under `2026-07-3` key in `mockData.js`
+- [x] Cross-Browser Login Compatibility (Safari, Edge)
+  - [x] Disable autocorrect & capitalization overrides on login input controls
+  - [x] Wrap sessionStorage and localStorage in exception-safe try-catch modules
+  - [x] Fix Safari credential keychain autofill state bypassing React onChange
+- [x] Sidebar Footer Fixed Layout & Icons
+  - [x] Change app-container to height: 100vh / overflow: hidden to freeze sidebar in place
+  - [x] Move main-content scrolling independently so sidebar footer is always visible at the bottom
+  - [x] Revert "대시보드" tab icon to `LayoutDashboard` to match initial design specifications
+- [x] Mobile Responsive Optimization (반응형 웹)
+  - [x] Style mobile sidebar menu drawer (collapsible menu) with backdrop click dismiss
+  - [x] Add Menu hamburger toggle button on header and X close button on sidebar
+  - [x] Stack Weekly Selector Bar (Y-M-W controls) vertically on small screens
+  - [x] Implement 2-column actions toolbar with grid layouts for mobile buttons list
+  - [x] Wrap bottom card groups in responsive `.dashboard-bottom-grid` (collapses to single column on mobile)
+- [x] Region Matching Normalization (새신자 vs 새신자지역)
+  - [x] Define a `normalizeRegion` helper to strip "지역" suffixes from inputs
+  - [x] Apply normalization during Dashboard calculations, KPI cards filtering, and Attendance grid filters
+- [x] Rename Wanseong region to Seonggun (완성지역 ➡️ 성군지역)
+  - [x] Update uniqueRegions lists in DashboardTab, AttendanceTab, and MemberTab
+  - [x] Rename mock records in mockData.js and breakdown calculation parameters
+- [x] Database Clearance (Wipe active records)
+  - [x] Implement a one-time force clearance migration on mount to wipe existing browser records
+  - [x] Change default database fallback to `[]` (empty array) for clean-slate boots
+- [x] Firebase Cloud Database Connection Setup
+  - [x] Register new Web App under the `clerk-s-home` project
+  - [x] Integrate Firestore SDK configuration to `src/firebase.js`
+  - [x] Enable Google Cloud Firestore API automatically on user's project
+  - [x] Provision native Cloud Firestore database instance in the Seoul (`asia-northeast3`) region
+  - [x] Deploy public development Firestore security rules (`firestore.rules`) allowing read/write access
+  - [x] Write Firestore snapshot listeners for real-time synchronization
+  - [x] Add robust offline local storage fallbacks in case of Firebase connection errors
+  - [x] Sync deleted records (data reset) to Firestore so they don't load back on reload
+- [x] Verification & Walkthrough
+  - [x] Run `npm run build` to verify
+  - [x] Create walkthrough documentation
