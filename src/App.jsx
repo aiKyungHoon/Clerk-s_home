@@ -67,21 +67,26 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        const userEmail = firebaseUser.email;
-        const profile = clerks.find(c => 
-          String(c.email || c.id).toLowerCase() === userEmail.toLowerCase() || 
-          String(c.uid) === firebaseUser.uid
-        );
+        const userEmail = firebaseUser.email || '';
+        const profile = clerks.find(c => {
+          const cEmail = String(c?.email || c?.id || '');
+          const cUid = String(c?.uid || '');
+          return (
+            (cEmail && userEmail && cEmail.toLowerCase() === userEmail.toLowerCase()) ||
+            (cUid && firebaseUser.uid && cUid === firebaseUser.uid)
+          );
+        });
         if (profile) {
           setCurrentUser(profile);
           setIsLoggedIn(true);
           safeSessionSet('clerks_logged_in', 'true');
           safeSessionSet('clerks_current_user', JSON.stringify(profile));
         } else if (clerks.length > 0) {
+          const emailPrefix = userEmail ? userEmail.split('@')[0] : 'user';
           const tempProfile = {
-            id: userEmail.split('@')[0],
+            id: emailPrefix,
             email: userEmail,
-            name: userEmail.split('@')[0],
+            name: emailPrefix,
             role: 'super',
             region: '전체',
             uid: firebaseUser.uid

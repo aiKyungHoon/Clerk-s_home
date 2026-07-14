@@ -26,18 +26,24 @@ export default function LoginPage({ clerks, onLogin }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, p);
       const user = userCredential.user;
 
-      const matchedClerk = clerks.find(c => 
-        String(c.email || c.id).toLowerCase() === user.email.toLowerCase() || 
-        String(c.uid) === user.uid
-      );
+      const matchedClerk = clerks.find(c => {
+        const cEmail = String(c?.email || c?.id || '');
+        const cUid = String(c?.uid || '');
+        const userEmail = user.email || '';
+        return (
+          (cEmail && userEmail && cEmail.toLowerCase() === userEmail.toLowerCase()) ||
+          (cUid && user.uid && cUid === user.uid)
+        );
+      });
 
       if (matchedClerk) {
         onLogin(matchedClerk);
       } else {
+        const emailPrefix = user.email ? user.email.split('@')[0] : 'user';
         onLogin({
-          id: user.email.split('@')[0],
-          email: user.email,
-          name: user.email.split('@')[0],
+          id: emailPrefix,
+          email: user.email || '',
+          name: emailPrefix,
           role: 'super',
           region: '전체',
           uid: user.uid

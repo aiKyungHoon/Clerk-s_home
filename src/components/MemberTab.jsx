@@ -111,7 +111,7 @@ export default function MemberTab({ clerks, onAddClerk, onUpdateClerk, onDeleteC
     }
     
     // Check duplicate ID
-    if (clerks.some(c => c.username.toLowerCase() === formData.username.trim().toLowerCase())) {
+    if (clerks.some(c => (c.username || '').toLowerCase() === formData.username.trim().toLowerCase())) {
       alert('이미 존재하는 아이디입니다.');
       return;
     }
