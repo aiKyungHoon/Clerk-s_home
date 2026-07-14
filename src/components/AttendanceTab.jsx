@@ -155,21 +155,21 @@ export default function AttendanceTab({
     if (isSunday) {
       // Row 0: Title
       wsData.push([titleText]);
-      merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 19 } });
+      merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 20 } });
 
       // Row 1: Group Headers
       wsData.push([
-        '지역', '출결재적', '대면예배', '', '화정성전', '', '', '', '', '상수', '', '', '모임방', '', '기타', '', '', '', '', ''
+        '지역', '출결재적', '대면예배', '', '화정성전', '', '', '', '', '상수', '', '', '모임방', '', '기타', '', '', '', '', '', ''
       ]);
       merges.push({ s: { r: 1, c: 2 }, e: { r: 1, c: 3 } }); // 대면예배
       merges.push({ s: { r: 1, c: 4 }, e: { r: 1, c: 8 } }); // 화정성전
       merges.push({ s: { r: 1, c: 9 }, e: { r: 1, c: 11 } }); // 상수
       merges.push({ s: { r: 1, c: 12 }, e: { r: 1, c: 13 } }); // 모임방
-      merges.push({ s: { r: 1, c: 14 }, e: { r: 1, c: 19 } }); // 기타
+      merges.push({ s: { r: 1, c: 14 }, e: { r: 1, c: 20 } }); // 기타
 
       // Row 2: Sub Headers
       wsData.push([
-        '', '', '인원', '비율', '7시30분', '9시', '12시', '15시', '20시', '12시', '17시', '20시', '주엽 12시', '서교 12시', '협교', '형제', '위니크', '국제', '사랑', '그외'
+        '', '', '인원', '비율', '7시30분', '9시', '12시', '15시', '20시', '12시', '17시', '20시', '주엽 12시', '서교 12시', '협교', '형제', '위니크', '국제', '사랑', '그외', '줌'
       ]);
       
       merges.push({ s: { r: 1, c: 0 }, e: { r: 2, c: 0 } });
@@ -198,7 +198,8 @@ export default function AttendanceTab({
           row.others[2] || 0,
           row.others[3] || 0,
           row.others[4] || 0,
-          row.others[5] || 0
+          row.others[5] || 0,
+          row.others[6] || 0
         ]);
       });
 
@@ -457,8 +458,8 @@ export default function AttendanceTab({
 
       // Others
       writeCell(1, 14, '기타', groupHeaderStyle);
-      for (let c = 15; c <= 19; c++) writeCell(1, c, '', groupHeaderStyle);
-      merges.push({ s: { r: 1, c: 14 }, e: { r: 1, c: 19 } });
+      for (let c = 15; c <= 20; c++) writeCell(1, c, '', groupHeaderStyle);
+      merges.push({ s: { r: 1, c: 14 }, e: { r: 1, c: 20 } });
 
       // Row 2 Headers
       writeCell(2, 2, '인원', subHeaderStyle);
@@ -479,6 +480,7 @@ export default function AttendanceTab({
       writeCell(2, 17, '국제', subHeaderStyle);
       writeCell(2, 18, '사랑', subHeaderStyle);
       writeCell(2, 19, '그외', subHeaderStyle);
+      writeCell(2, 20, '줌', subHeaderStyle);
 
       // Data Rows
       let currentRowIdx = 3;
@@ -531,6 +533,7 @@ export default function AttendanceTab({
         writeCell(currentRowIdx, 17, row.others[3] || '', getCellStyles(row.others[3], row.pointerMax));
         writeCell(currentRowIdx, 18, row.others[4] || '', getCellStyles(row.others[4], row.pointerMax));
         writeCell(currentRowIdx, 19, row.others[5] || '', getCellStyles(row.others[5], row.pointerMax));
+        writeCell(currentRowIdx, 20, row.others[6] || '', getCellStyles(row.others[6], row.pointerMax));
 
         currentRowIdx++;
       });
@@ -557,6 +560,7 @@ export default function AttendanceTab({
       writeCell(currentRowIdx, 17, sunOthersSums[3], totalRowStyle);
       writeCell(currentRowIdx, 18, sunOthersSums[4], totalRowStyle);
       writeCell(currentRowIdx, 19, sunOthersSums[5], totalRowStyle);
+      writeCell(currentRowIdx, 20, sunOthersSums[6], totalRowStyle);
 
     } else {
       // Wednesday Worship
@@ -1182,12 +1186,16 @@ export default function AttendanceTab({
     const others_gukje = filterOthers('국제');
     const others_sarang = filterOthers('사랑');
     const others_geuoe = filterOthers('그외');
+    const others_zoom = regRecords.filter(r => {
+      const val = String(r[worshipField] || '').trim();
+      return val === '줌' || val.toLowerCase().includes('zoom');
+    }).length;
 
     const daemyunTotal = 
       hwajeong_730 + hwajeong_900 + hwajeong_1200 + hwajeong_1500 + hwajeong_2000 +
       sangsu_1200 + sangsu_1700 + sangsu_2000 +
       moimbang_juyeop + moimbang_seogyo +
-      others_hupgyo + others_hyungje + others_winique + others_gukje + others_sarang + others_geuoe;
+      others_hupgyo + others_hyungje + others_winique + others_gukje + others_sarang + others_geuoe + others_zoom;
 
     return {
       region: regionName,
@@ -1197,7 +1205,7 @@ export default function AttendanceTab({
       pointerMax: Math.max(hwajeong_730, hwajeong_900, hwajeong_1200, hwajeong_1500, hwajeong_2000),
       sangsu: [sangsu_1200, sangsu_1700, sangsu_2000],
       moimbang: [moimbang_juyeop, moimbang_seogyo],
-      others: [others_hupgyo, others_hyungje, others_winique, others_gukje, others_sarang, others_geuoe]
+      others: [others_hupgyo, others_hyungje, others_winique, others_gukje, others_sarang, others_geuoe, others_zoom]
     };
   };
 
@@ -1296,7 +1304,7 @@ export default function AttendanceTab({
   const sunHwajeongSums = [0, 1, 2, 3, 4].map(idx => sunRowsData.reduce((acc, r) => acc + r.hwajeong[idx], 0));
   const sunSangsuSums = [0, 1, 2].map(idx => sunRowsData.reduce((acc, r) => acc + r.sangsu[idx], 0));
   const sunMoimbangSums = [0, 1].map(idx => sunRowsData.reduce((acc, r) => acc + r.moimbang[idx], 0));
-  const sunOthersSums = [0, 1, 2, 3, 4, 5].map(idx => sunRowsData.reduce((acc, r) => acc + r.others[idx], 0));
+  const sunOthersSums = [0, 1, 2, 3, 4, 5, 6].map(idx => sunRowsData.reduce((acc, r) => acc + r.others[idx], 0));
 
   // Wednesday sums
   const wedTotalSum = wedRowsData.reduce((acc, r) => acc + r.total, 0);
@@ -1611,7 +1619,7 @@ export default function AttendanceTab({
             <table className="table-custom" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '0.85rem', margin: 0 }}>
               <thead>
                 <tr>
-                  <th colSpan="19" style={{ backgroundColor: '#166534', color: 'white', fontWeight: 700, padding: '10px', fontSize: '1rem', borderBottom: '1px solid #14532d' }}>
+                  <th colSpan="20" style={{ backgroundColor: '#166534', color: 'white', fontWeight: 700, padding: '10px', fontSize: '1rem', borderBottom: '1px solid #14532d' }}>
                     주일예배 · {activeWorshipType === 'planned' ? '사전 현황' : '실제 현황'}
                   </th>
                 </tr>
@@ -1622,7 +1630,7 @@ export default function AttendanceTab({
                   <th colSpan="5" style={{ borderRight: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>화정성전</th>
                   <th colSpan="3" style={{ borderRight: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>상수</th>
                   <th colSpan="2" style={{ borderRight: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>모임방</th>
-                  <th colSpan="6" style={{ borderBottom: '1px solid var(--border-light)' }}>기타</th>
+                  <th colSpan="7" style={{ borderBottom: '1px solid var(--border-light)' }}>기타</th>
                 </tr>
                 <tr style={{ backgroundColor: '#f8fafc' }}>
                   <th style={{ borderRight: '1px solid var(--border-light)', borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>인원</th>
@@ -1642,7 +1650,8 @@ export default function AttendanceTab({
                   <th style={{ borderRight: '1px solid var(--border-light)', borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>위니크</th>
                   <th style={{ borderRight: '1px solid var(--border-light)', borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>국제</th>
                   <th style={{ borderRight: '1px solid var(--border-light)', borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>사랑</th>
-                  <th style={{ borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>그외</th>
+                  <th style={{ borderRight: '1px solid var(--border-light)', borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>그외</th>
+                  <th style={{ borderBottom: '2.5px solid var(--border-light)', fontSize: '0.75rem' }}>줌</th>
                 </tr>
               </thead>
               <tbody>
@@ -1672,7 +1681,8 @@ export default function AttendanceTab({
                       <td style={{ borderRight: '1px solid var(--border-light)', backgroundColor: getCellBg(row.others[2], maxVal) }}>{row.others[2] || ''}</td>
                       <td style={{ borderRight: '1px solid var(--border-light)', backgroundColor: getCellBg(row.others[3], maxVal) }}>{row.others[3] || ''}</td>
                       <td style={{ borderRight: '1px solid var(--border-light)', backgroundColor: getCellBg(row.others[4], maxVal) }}>{row.others[4] || ''}</td>
-                      <td style={{ backgroundColor: getCellBg(row.others[5], maxVal) }}>{row.others[5] || ''}</td>
+                      <td style={{ borderRight: '1px solid var(--border-light)', backgroundColor: getCellBg(row.others[5], maxVal) }}>{row.others[5] || ''}</td>
+                      <td style={{ backgroundColor: getCellBg(row.others[6], maxVal) }}>{row.others[6] || ''}</td>
                     </tr>
                   );
                 })}
@@ -1696,7 +1706,8 @@ export default function AttendanceTab({
                   <td style={{ borderRight: '1px solid var(--border-light)' }}>{sunOthersSums[2]}</td>
                   <td style={{ borderRight: '1px solid var(--border-light)' }}>{sunOthersSums[3]}</td>
                   <td style={{ borderRight: '1px solid var(--border-light)' }}>{sunOthersSums[4]}</td>
-                  <td>{sunOthersSums[5]}</td>
+                  <td style={{ borderRight: '1px solid var(--border-light)' }}>{sunOthersSums[5]}</td>
+                  <td>{sunOthersSums[6]}</td>
                 </tr>
               </tbody>
             </table>

@@ -84,7 +84,8 @@ export default function DashboardTab({ records, currentUser, selectedYear, selec
     ...['12시','17시','20시'].map(t=>({group:'상수',label:t,fn:v=>containsTime(v,'상수',t)})),
     {group:'모임방',label:'주엽',subLabel:'12시',fn:v=>containsTime(v,'주엽','12시')},
     {group:'모임방',label:'서교',subLabel:'12시',fn:v=>containsTime(v,'서교','12시')},
-    ...[['협교','협력교회'],['형제','형제교회'],['위니크','위니크'],['국제','국제'],['사랑','사랑'],['그외','그외']].map(([label,key])=>({group:'기타',label,fn:v=>v.includes(key)}))
+    ...[['협교','협력교회'],['형제','형제교회'],['위니크','위니크'],['국제','국제'],['사랑','사랑'],['그외','그외']].map(([label,key])=>({group:'기타',label,fn:v=>v.includes(key)})),
+    { group: '기타', label: '줌', fn: v => v === '줌' || v.toLowerCase().includes('zoom') }
   ];
   const wednesdayColumns = [
     { group:'전체 출석', label:'인원', fn:v=>isAttended(v), total:true },
