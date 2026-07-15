@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, ClipboardList, Users, Bell, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Users, Bell, Menu, X, LogOut } from 'lucide-react';
 import DashboardTab from './components/DashboardTab';
 import AttendanceTab from './components/AttendanceTab';
 import MemberTab from './components/MemberTab';
@@ -525,6 +525,49 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-bottom-nav">
+        <button 
+          className={`mobile-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
+        >
+          <LayoutDashboard size={20} />
+          <span>대시보드</span>
+        </button>
+        <button 
+          className={`mobile-nav-item ${activeTab === 'attendance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('attendance')}
+        >
+          <ClipboardList size={20} />
+          <span>출결관리</span>
+        </button>
+        {currentUser.role === 'super' && (
+          <button 
+            className={`mobile-nav-item ${activeTab === 'members' ? 'active' : ''}`}
+            onClick={() => setActiveTab('members')}
+          >
+            <Users size={20} />
+            <span>담당자 관리</span>
+          </button>
+        )}
+        <button 
+          className="mobile-nav-item"
+          onClick={async () => {
+            if (window.confirm("정말로 로그아웃 하시겠습니까?")) {
+              try {
+                await signOut(auth);
+              } catch (e) {
+                console.warn("Signout failed:", e);
+              }
+            }
+          }}
+          style={{ color: 'var(--accent-rose)' }}
+        >
+          <LogOut size={20} />
+          <span>로그아웃</span>
+        </button>
+      </nav>
     </div>
   );
 }
